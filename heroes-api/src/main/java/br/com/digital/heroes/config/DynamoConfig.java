@@ -1,4 +1,4 @@
-package br.com.digital.heroes.config;
+package com.digitalinnovation.livecoding.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -13,27 +13,31 @@ import org.springframework.util.StringUtils;
 @Configuration
 @EnableDynamoDBRepositories
 public class DynamoConfig {
+  @Value("${amazon.dynamodb.endpoint}")
+  private String amazonDynamoDBEndpoint;
 
-    @Value("${amazon.dynamodb.endpoint}")
-    private String amazonDynamoDBEndPoint;
+  @Value("${aws_access_key_id}")
+  private String amazonAWSAccessKey;
 
-    @Value("${aws_access_key_id}")
-    private String amazonAWSAccessKey;
+  @Value("${aws_secret_access_key}")
+  private String amazonAWSSecretKey;
 
-    @Value("${aws_secret_access_key}")
-    private String amazonAWSSecretKey;
+  @Bean
+  public AmazonDynamoDB amazonDynamoDB() {
+    AmazonDynamoDB amazonDynamoDB
+      = new AmazonDynamoDBClient(amazonAWSCredentials());
 
-    @Bean
-    public AmazonDynamoDB amazonDynamoDB(){
-        AmazonDynamoDB amazonDynamoDB = new AmazonDynamoDBClient(amazonAWSCredentials());
-        if(!StringUtils.isEmpty(amazonDynamoDB)){
-            amazonDynamoDB.setEndpoint(amazonDynamoDBEndPoint);
-        }
-        return amazonDynamoDB;
+    if (!StringUtils.isEmpty(amazonDynamoDBEndpoint)) {
+      amazonDynamoDB.setEndpoint(amazonDynamoDBEndpoint);
     }
 
-    @Bean
-    private AWSCredentials amazonAWSCredentials() {
-        return new BasicAWSCredentials(amazonAWSAccessKey,amazonAWSSecretKey);
-    }
+    return amazonDynamoDB;
+  }
+
+  @Bean
+  public AWSCredentials amazonAWSCredentials() {
+    return new BasicAWSCredentials(
+      amazonAWSAccessKey, amazonAWSSecretKey);
+  }
+
 }
